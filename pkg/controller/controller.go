@@ -496,7 +496,7 @@ func (ctrl *CSISnapshotController) syncUnboundSnapshot(snapshot *crdv1.VolumeSna
 		if !ok {
 			return fmt.Errorf("expected volume snapshot content, got %+v", contentObj)
 		}
-		
+
 		if err := ctrl.BindSnapshotContent(snapshot, content); err != nil {
 			// snapshot is bound but content is not bound to snapshot correctly
 			return fmt.Errorf("snapshot %s is bound, but VolumeSnapshotContent %s is not bound to the VolumeSnapshot correctly, %v", uniqueSnapshotName, content.Name, err)
@@ -721,7 +721,7 @@ func (ctrl *CSISnapshotController) updateSnapshotErrorStatusWithEvent(snapshot *
 				Time: time.Now(),
 			},
 			Message: message,
-		}	
+		}
 		snapshotClone.Status.Error = statusError
 	}
 	snapshotClone.Status.Bound = false
@@ -770,32 +770,28 @@ func (ctrl *CSISnapshotController) updateSnapshotBoundWithEvent(snapshot *crdv1.
 		return newSnapshot, err
 	}
 
-
 	return newSnapshot, nil
 }
-
 
 // Stateless functions
 func getSnapshotStatusForLogging(snapshot *crdv1.VolumeSnapshot) string {
 	return fmt.Sprintf("bound to: %q, Completed: %v", snapshot.Spec.SnapshotContentName, snapshot.Status.Bound)
 }
 
-
 func IsSnapshotBound(snapshot *crdv1.VolumeSnapshot, content *crdv1.VolumeSnapshotContent) bool {
 	if content.Spec.VolumeSnapshotRef != nil && content.Spec.VolumeSnapshotRef.Name == snapshot.Name &&
 		content.Spec.VolumeSnapshotRef.UID == snapshot.UID {
 		return true
-	} 
+	}
 	return false
 }
-
 
 func (ctrl *CSISnapshotController) BindSnapshotContent(snapshot *crdv1.VolumeSnapshot, content *crdv1.VolumeSnapshotContent) error {
 	if content.Spec.VolumeSnapshotRef == nil || content.Spec.VolumeSnapshotRef.Name != snapshot.Name {
 		return fmt.Errorf("Could not bind snapshot %s and content %s, the VolumeSnapshotRef does not match", snapshot.Name, content.Name)
 	} else if content.Spec.VolumeSnapshotRef.UID != "" && content.Spec.VolumeSnapshotRef.UID != snapshot.UID {
 		return fmt.Errorf("Could not bind snapshot %s and content %s, the VolumeSnapshotRef does not match", snapshot.Name, content.Name)
-	} else if  content.Spec.VolumeSnapshotRef.UID == "" {
+	} else if content.Spec.VolumeSnapshotRef.UID == "" {
 		content.Spec.VolumeSnapshotRef.UID = snapshot.UID
 		newContent, err := ctrl.clientset.VolumesnapshotV1alpha1().VolumeSnapshotContents().Update(content)
 		if err != nil {
