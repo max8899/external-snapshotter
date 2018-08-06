@@ -105,7 +105,7 @@ func storeObjectUpdate(store cache.Store, obj interface{}, className string) (bo
 	return true, nil
 }
 
-// getSnapshotContentNameForSnapshot returns SnapshotData.Name for the create VolumeSnapshotContent.
+// GetSnapshotContentNameForSnapshot returns SnapshotData.Name for the create VolumeSnapshotContent.
 // The name must be unique.
 func GetSnapshotContentNameForSnapshot(snapshot *crdv1.VolumeSnapshot) string {
 	return "snapdata-" + string(snapshot.UID)
